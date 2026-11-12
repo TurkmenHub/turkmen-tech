@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurkmenHub - Resmi Platform</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background: #061a14; color: #f8fafc; min-height: 100vh; padding-bottom: 90px; }
+        
+        .top-header { padding: 20px 20px 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .top-header h1 { font-size: 1.5rem; color: #34d399; font-weight: 700; }
+        .user-balance { background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; color: #34d399; font-weight: 600; }
+
+        .tab-content { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
+        .tab-content.active { display: block; }
+
+        .card { background: rgba(13, 38, 30, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(52, 211, 153, 0.15); border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .card img, .card video { width: 100%; height: 220px; object-fit: cover; background: #022c22; }
+        .card-body { padding: 15px; }
+        .card-title { font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.9rem; }
+        .price-tag { color: #34d399; font-weight: bold; }
+        .reward-btn { background: #059669; color: white; border: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .reward-btn:disabled { background: #134e3a; color: #6ee7b7; cursor: not-allowed; }
+
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; background: rgba(10, 30, 24, 0.85); backdrop-filter: blur(20px); border: 1px solid rgba(252, 252, 252, 0.15); display: flex; justify-content: space-around; padding: 12px 0; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; }
+        .nav-item { background: none; border: none; color: #94a3b8; font-size: 0.8rem; text-align: center; cursor: pointer; flex: 1; transition: color 0.2s; }
+        .nav-item.active { color: #34d399; font-weight: bold; }
+        .nav-item div { font-size: 1.2rem; margin-bottom: 2px; }
+
+        .profile-box { text-align: center; padding: 30px 20px; background: rgba(13, 38, 30, 0.85); border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.15); }
+        .profile-avatar { width: 80px; height: 80px; background: #059669; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; }
+        .profile-name { font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .profile-warning { color: #f59e0b; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.4; padding: 0 10px; }
+        
+        .google-btn { background: #ffffff; color: #1f2937; border: none; width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        
+        .edit-profile-box { margin-top: 15px; text-align: left; background: rgba(2, 44, 34, 0.6); padding: 15px; border-radius: 12px; }
+        .edit-profile-box input { width: 100%; padding: 10px; margin-bottom: 10px; background: #061a14; border: 1px solid #059669; border-radius: 8px; color: white; outline: none; }
+        .edit-profile-box button { width: 100%; background: #34d399; color: #022c22; font-weight: bold; padding: 10px; border: none; border-radius: 8px; cursor: pointer; }
+
+        .profile-stats { margin-top: 20px; display: flex; justify-content: space-around; background: rgba(2, 44, 34, 0.5); padding: 15px; border-radius: 14px; }
+        .logout-btn { margin-top: 15px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
+
+        /* GİZLİ ADMIN PANELİ */
+        #adminView { display: none; padding: 20px; max-width: 500px; margin: 0 auto; background: #022c22; border-radius: 20px; border: 1px solid #34d399; margin-top: 20px; }
+        #adminView h2 { color: #34d399; margin-bottom: 15px; }
+        #adminView input, #adminView select { width: 100%; padding: 12px; margin-bottom: 12px; background: #061a14; border: 1px solid #059669; border-radius: 8px; color: white; outline: none; }
+        #adminView button.save-btn { width: 100%; background: #34d399; color: #022c22; font-weight: bold; padding: 12px; border: none; border-radius: 8px; cursor: pointer; }
+        .admin-section { background: rgba(6, 26, 20, 0.8); padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(52, 211, 153, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div id="mainSiteView">
+        <div class="top-header">
+            <h1 id="headerTitle">Mahabat</h1>
+            <div class="user-balance">⭐ <span id="userPoints">0</span> Puan</div>
+        </div>
+
+        <!-- 1. MAHABAT -->
+        <div id="tab-mahabat" class="tab-content active">
+            <div id="feedContainer">
+                <p style="color:#94a3b8; text-align:center; padding:20px;">Häzirlikçe mahabat ýok kardeşim.</p>
+            </div>
+        </div>
+
+        <!-- 2. SÖWGATLAR -->
+        <div id="tab-sowgat" class="tab-content">
+            <div id="giftContainer">
+                <p style="color:#94a3b8; text-align:center; padding:20px;">Häzirlikçe sowgat ýok kardeşim.</p>
+            </div>
+        </div>
+
+        <!-- 3. PROFİL -->
+        <div id="tab-profil" class="tab-content">
+            <div class="profile-box">
+                <div class="profile-avatar">👤</div>
+                <div id="profileInfo">
+                    <div class="profile-warning">Siz şu an kayıtta dälsiňiz. Google hasabyňyz bilen bir basyşda giriň!</div>
+                    <button class="google-btn" onclick="loginWithGoogle()">
+                        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.85 2.08-1.81 2.72v2.26h2.92c1.71-1.57 2.69-3.88 2.69-6.63z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.71H.95v2.33C2.43 15.75 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.75c-.18-.54-.28-1.12-.28-1.75s.1-1.21.28-1.75V4.92H.95C.34 6.13 0 7.5 0 9s.34 2.87.95 4.08l3.02-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.48 0 2.43 2.25.95 4.92l3.02 2.33c.71-2.13 2.69-3.71 5.03-3.71z"/></svg>
+                        Google Hasaby bilen Gir
+                    </button>
+                </div>
+
+                <div id="profileDetails" style="display:none;">
+                    <div class="profile-name" id="pName">Ad</div>
+                    <p style="color: #34d399; font-size: 0.9rem;" id="pEmail">email</p>
+                    <p style="color: #38bdf8; font-size: 0.85rem; margin-top:5px;" id="pPhone">Tel: Belirtilmedik</p>
+                    
+                    <div class="profile-stats">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight:bold; color:#34d399;" id="statPoints">0</div>
+                            <div style="font-size:0.8rem; color:#94a3b8;">Jemi Puan</div>
+                        </div>
+                    </div>
+
+                    <!-- Profili Özelleştir / Düzenle -->
+                    <div class="edit-profile-box">
+                        <p style="color:#34d399; font-size:0.85rem; margin-bottom:8px; font-weight:bold;">⚙️ Adyňyzy we Telefon Belgiňizi Ýazyň:</p>
+                        <input type="text" id="editName" placeholder="Adyňyz / Takma adyňyz">
+                        <input type="tel" id="editPhone" placeholder="Ödül üçin Telefon (Örn: +99361234567)">
+                        <button onclick="updateProfile()">Üýtgeşmeleri Ýatda Sakla</button>
+                    </div>
+
+                    <button class="logout-btn" onclick="logoutUser()">Hasaptan Çykmak</button>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('mahabat', this)">
+                <div>📢</div>Mahabat
+            </button>
+            <button class="nav-item" onclick="switchTab('sowgat', this)">
+                <div>🎁</div>Sowgat
+            </button>
+            <button class="nav-item" onclick="switchTab('profil', this)">
+                <div>👤</div>Profil
+            </button>
+        </nav>
+    </div>
+
+    <!-- GİZLİ ADMIN ODASI (/admin777) -->
+    <div id="adminView">
+        <h2>🔒 TurkmenHub Gizli Admin Odasy</h2>
+        
+        <div class="admin-section">
+            <h3 style="color:#34d399; font-size:1rem; margin-bottom:10px;">+ Täze Mahabat ýa-da Sowgat Goş</h3>
+            <input type="text" id="admTitle" placeholder="Başlık">
+            <input type="text" id="admMedia" placeholder="Media Linki">
+            <select id="admTab">
+                <option value="mahabat">Mahabat</option>
+                <option value="sowgat">Söwgat</option>
+            </select>
+            <input type="text" id="admPrice" placeholder="Baha / Puan">
+            <button class="save-btn" onclick="adminAddNewItem()">Sisteme Goş</button>
+        </div>
+
+        <div class="admin-section">
+            <h3 style="color:#34d399; font-size:1rem; margin-bottom:10px;">🎁 Ödül Talap Edenler (Çekiliş Listesi)</h3>
+            <div id="adminClaimsList" style="font-size:0.85rem; color:#cbd5e1; max-height:200px; overflow-y:auto; background:#061a14; padding:10px; border-radius:8px;">
+                Talap yok.
+            </div>
+        </div>
+
+        <button onclick="window.location.href=window.location.pathname" style="width:100%; margin-top:15px; background:none; border:1px solid #34d399; color:#34d399; padding:10px; border-radius:8px; cursor:pointer;">Ana Sahypa Gaýdyp Baryň</button>
+    </div>
+
+    <script>
+        if(window.location.hash === '#admin777' || window.location.search.includes('admin777')) {
+            const pwd = prompt("Gizli Admin Parolyny Gir Kardeşim:");
+            if(pwd === "7777") {
+                document.getElementById('mainSiteView').style.display = 'none';
+                document.getElementById('adminView').style.display = 'block';
+                renderAdminClaims();
+            } else {
+                alert("Ýalňyş parol!");
+                window.location.href = window.location.pathname;
+            }
+        }
+
+        let currentUser = localStorage.getItem('tm_user') ? JSON.parse(localStorage.getItem('tm_user')) : null;
+        let items = localStorage.getItem('tm_items') ? JSON.parse(localStorage.getItem('tm_items')) : [
+            { id: 1, type: 'mahabat', title: 'Täze iPhone 18 Pro Max Görnüşi', media: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500', price: 'Görüldü: +10 Puan', points: 10 },
+            { id: 2, type: 'sowgat', title: '50 Manat Sowgat Karty', media: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500', price: '⭐ 800 Puan', points: 800 }
+        ];
+        let claims = localStorage.getItem('tm_claims') ? JSON.parse(localStorage.getItem('tm_claims')) : [];
+
+        function initApp() {
+            renderItems();
+            if(currentUser) {
+                document.getElementById('userPoints').innerText = currentUser.points;
+                document.getElementById('profileInfo').style.display = 'none';
+                document.getElementById('profileDetails').style.display = 'block';
+                document.getElementById('pName').innerText = currentUser.username;
+                document.getElementById('pEmail').innerText = currentUser.email;
+                document.getElementById('pPhone').innerText = "Tel: " + (currentUser.phone || "Ýazylmady (Ödül üçin hökman ýazyň!)");
+                document.getElementById('statPoints').innerText = currentUser.points;
+                
+                document.getElementById('editName').value = currentUser.username;
+                document.getElementById('editPhone').value = currentUser.phone || '';
+            }
+        }
+
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            element.classList.add('active');
+            const titles = { 'mahabat': 'Mahabat', 'sowgat': 'Sowgatlar', 'profil': 'Personal Hasap' };
+            document.getElementById('headerTitle').innerText = titles[tabName];
+        }
+
+        function loginWithGoogle() {
+            let userEmail = prompt("Google (Gmail) salgyňyzy girin:");
+            if(!userEmail || !userEmail.includes('@')) {
+                alert("Dogry Gmail salgysyny girin!");
+                return;
+            }
+            let defaultName = userEmail.split('@')[0];
+
+            currentUser = { email: userEmail, username: defaultName, phone: '', points: 0, history: {} };
+            localStorage.setItem('tm_user', JSON.stringify(currentUser));
+            initApp();
+            alert("Google hasaby bilen girildi! Adyňyzy we telefon belgiňizi profilden özleşdirip bilersiňiz.");
+        }
+
+        function updateProfile() {
+            const newName = document.getElementById('editName').value;
+            const newPhone = document.getElementById('editPhone').value;
+            if(!newName) {
+                alert("Adyňyz boş bolmaly däl!");
+                return;
+            }
+            currentUser.username = newName;
+            currentUser.phone = newPhone;
+            localStorage.setItem('tm_user', JSON.stringify(currentUser));
+            initApp();
+            alert("Profil üstünlikli ýatda saklandy kardeşim!");
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('tm_user');
+            window.location.reload();
+        }
+
+        function renderItems() {
+            const feedContainer = document.getElementById('feedContainer');
+            const giftContainer = document.getElementById('giftContainer');
+            feedContainer.innerHTML = '';
+            giftContainer.innerHTML = '';
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                let mediaEl = `<img src="${item.media}" alt="Media">`;
+                if(item.media.endsWith('.mp4') || item.media.includes('video')) {
+                    mediaEl = `<video src="${item.media}" controls></video>`;
+                }
+
+                let btnHtml = '';
+                if(item.type === 'mahabat') {
+                    let lastWatched = currentUser && currentUser.history && currentUser.history[item.id] ? currentUser.history[item.id] : 0;
+                    let now = new Date().getTime();
+                    let hoursPassed = (now - lastWatched) / (1000 * 60 * 60);
+
+                    if(hoursPassed < 24 && lastWatched !== 0) {
+                        let remaining = Math.ceil(24 - hoursPassed);
+                        btnHtml = `<button class="reward-btn" disabled>Garasyň (${remaining} sagat)</button>`;
+                    } else {
+                        btnHtml = `<button class="reward-btn" onclick="watchItem(${item.id}, ${item.points})">Seret (+${item.points})</button>`;
+                    }
+                } else {
+                    btnHtml = `<button class="reward-btn" onclick="claimGift(${item.points}, '${item.title}')">Çek Al</button>`;
+                }
+
+                card.innerHTML = `
+                    ${mediaEl}
+                    <div class="card-body">
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-footer">
+                            <span class="price-tag">${item.price}</span>
+                            ${btnHtml}
+                        </div>
+                    </div>
+                `;
+
+                if(item.type === 'mahabat') feedContainer.appendChild(card);
+                else giftContainer.appendChild(card);
+            });
+        }
+
+        function watchItem(id, amt) {
+            if(!currentUser) {
+                alert("Ilki bilen Google hasabyňyz bilen giriň kardeşim!");
+                switchTab('profil', document.querySelectorAll('.nav-item')[2]);
+                return;
+            }
+            currentUser.points += amt;
+            if(!currentUser.history) currentUser.history = {};
+            currentUser.history[id] = new Date().getTime();
+            
+            localStorage.setItem('tm_user', JSON.stringify(currentUser));
+            document.getElementById('userPoints').innerText = currentUser.points;
+            if(document.getElementById('statPoints')) document.getElementById('statPoints').innerText = currentUser.points;
+            renderItems();
+            alert("Görüldü! +" + amt + " puan goşuldy kardeşim!");
+        }
+
+        function claimGift(cost, giftTitle) {
+            if(!currentUser) {
+                alert("Ilki bilen hasaba giriň kardeşim!");
+                switchTab('profil', document.querySelectorAll('.nav-item')[2]);
+                return;
+            }
+            if(!currentUser.phone) {
+                alert("Ödül / 50 manat alyp bilmek üçin profilden telefon belgiňizi hökman ýazyň!");
+                switchTab('profil', document.querySelectorAll('.nav-item')[2]);
+                return;
+            }
+            if(currentUser.points >= cost) {
+                currentUser.points -= cost;
+                localStorage.setItem('tm_user', JSON.stringify(currentUser));
+                document.getElementById('userPoints').innerText = currentUser.points;
+                document.getElementById('statPoints').innerText = currentUser.points;
+                
+                // Admin paneline talep kaydı düş
+                claims.push({ name: currentUser.username, phone: currentUser.phone, email: currentUser.email, gift: giftTitle, date: new Date().toLocaleString() });
+                localStorage.setItem('tm_claims', JSON.stringify(claims));
+
+                alert("Tebrikler! Sowgat talabyňyz ugradyldy. Admin tarapyndan barlanyp telefon belgiňize ugradylar!");
+            } else {
+                alert("Puanyňyz ýetmeýär kardeşim!");
+            }
+        }
+
+        function adminAddNewItem() {
+            const title = document.getElementById('admTitle').value;
+            const media = document.getElementById('admMedia').value;
+            const type = document.getElementById('admTab').value;
+            const price = document.getElementById('admPrice').value;
+
+            if(!title || !media) {
+                alert("Başlyk we media linkini dolduryň!");
+                return;
+            }
+
+            const newItem = { id: Date.now(), type: type, title: title, media: media, price: price, points: 10 };
+            items.unshift(newItem);
+            localStorage.setItem('tm_items', JSON.stringify(items));
+            alert("Üstünlikli goşuldy kardeşim!");
+            window.location.href = window.location.pathname;
+        }
+
+        function renderAdminClaims() {
+            const listEl = document.getElementById('adminClaimsList');
+            if(claims.length === 0) {
+                listEl.innerHTML = "Häzirlikçe sowgat talap eden ýok.";
+                return;
+            }
+            let html = "";
+            claims.forEach((c, index) => {
+                html += `<div style="border-bottom:1px solid #059669; padding:8px 0;">
+                    <b>#${index+1} ${c.name}</b><br>
+                    Tel: <span style="color:#34d399; font-weight:bold;">${c.phone}</span><br>
+                    Sowgat: ${c.gift} (${c.date})
+                </div>`;
+            });
+            listEl.innerHTML = html;
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
